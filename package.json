@@ -1,0 +1,19 @@
+{
+  "name": "stellar-ai",
+  "version": "0.1.0",
+  "description": "零依赖可验证 AI 内核：tape 自动微分 + RoPE/GQA/SwiGLU/MoE + KAN，有限差分梯度检验全绿",
+  "main": "src/autograd.js",
+  "scripts": {
+    "test": "node test/selftest.js"
+  },
+  "keywords": [
+    "autograd", "transformer", "rope", "gqa", "swiglu", "moe", "kan",
+    "kolmogorov-arnold", "deep-learning", "zero-dependency", "verifiable"
+  ],
+  "author": "晨星 (CJX0712)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CJX0712/stellar-ai.git"
+  }
+}

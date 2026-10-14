@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>stellar-ai · 可验证 AI 内核自检</title>
+<style>
+  :root {
+    --bg: #0b0e14; --panel: #131824; --line: #232a3a; --fg: #e6e9f0;
+    --muted: #8a93a6; --accent: #5eead4; --ok: #34d399; --bad: #f87171;
+    --mono: "SF Mono", "JetBrains Mono", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.5; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  header h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: .5px; }
+  header h1 .star { color: var(--accent); }
+  header p { color: var(--muted); margin: 0 0 18px; font-size: 13px; }
+  .badge { display: inline-block; font-size: 12px; color: var(--accent);
+    border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; margin-right: 6px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 16px; }
+  .summary { display: flex; gap: 22px; align-items: baseline; flex-wrap: wrap; }
+  .summary .big { font-size: 30px; font-weight: 700; font-family: var(--mono); }
+  .summary .ok { color: var(--ok); } .summary .bad { color: var(--bad); }
+  .summary .lbl { color: var(--muted); font-size: 13px; }
+  button {
+    background: var(--accent); color: #04231d; border: 0; border-radius: 8px;
+    padding: 9px 18px; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .55; cursor: default; }
+  #log { font-family: var(--mono); font-size: 12.5px; white-space: pre-wrap;
+    margin: 0; min-height: 40px; }
+  .line { padding: 1px 0; }
+  .sec { color: var(--accent); font-weight: 600; margin-top: 10px; }
+  a { color: var(--accent); }
+  footer { color: var(--muted); font-size: 12px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="star">✦</span> stellar-ai</h1>
+    <p>零依赖可微 AI 内核 · 站在世界顶级成果之上的「集大成 + 创新」验证台</p>
+    <div>
+      <span class="badge">tape 自动微分</span>
+      <span class="badge">RoPE</span>
+      <span class="badge">GQA</span>
+      <span class="badge">SwiGLU</span>
+      <span class="badge">MoE</span>
+      <span class="badge">KAN</span>
+      <span class="badge">有限差分校验</span>
+    </div>
+  </header>
+
+  <div class="panel">
+    <div class="summary">
+      <div><span class="big ok" id="p">–</span> <span class="lbl">通过</span></div>
+      <div><span class="big bad" id="f">–</span> <span class="lbl">失败</span></div>
+      <div style="margin-left:auto"><button id="run">▶ 运行自检</button></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div id="log">点击「运行自检」开始：对每个算子做有限差分梯度检验，并验证数学不变量与训练闭环。</div>
+  </div>
+
+  <footer>
+    作者：晨星 (CJX0712) · 同一份 <code>src/</code> 与 <code>test/checks.js</code> 亦可在 Node 无头运行：
+    <code>node test/selftest.js</code>
+  </footer>
+</div>
+
+<script src="src/autograd.js"></script>
+<script src="src/models.js"></script>
+<script src="test/checks.js"></script>
+<script>
+  const logEl = document.getElementById('log');
+  const pEl = document.getElementById('p');
+  const fEl = document.getElementById('f');
+  const btn = document.getElementById('run');
+  let buf = [];
+  function log(line) {
+    buf.push(line);
+    if (line.startsWith('===')) {
+      logEl.innerHTML += '<span class="line sec">' + esc(line) + '</span>\n';
+    } else {
+      const ok = line.startsWith('✅');
+      const color = line.startsWith('✅') ? 'var(--ok)' : (line.startsWith('❌') ? 'var(--bad)' : 'inherit');
+      logEl.innerHTML += '<span class="line" style="color:' + color + '">' + esc(line) + '</span>\n';
+    }
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function run() {
+    logEl.innerHTML = ''; buf = []; pEl.textContent = '–'; fEl.textContent = '–';
+    btn.disabled = true;
+    setTimeout(() => {
+      try {
+        const { pass, fail } = window.StellarChecks.runAll(window.StellarCore, window.StellarModels, log);
+        pEl.textContent = pass; fEl.textContent = fail;
+      } catch (e) {
+        log('❌ 运行异常: ' + e.message);
+        fEl.textContent = '!';
+      } finally {
+        btn.disabled = false;
+      }
+    }, 30);
+  }
+  btn.addEventListener('click', run);
+</script>
+</body>
+</html>
