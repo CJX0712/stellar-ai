@@ -1,5 +1,12 @@
 # ✦ stellar-ai
 
+<div align="center">
+
+[![License](https://img.shields.io/badge/License-MIT-green)](https://github.com/CJX0712/stellar-ai/blob/main/LICENSE) [![Language](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript)](https://github.com/CJX0712/stellar-ai) [![Deps](https://img.shields.io/badge/dependencies-0-brightgreen)](https://github.com/CJX0712) [![Verified](https://img.shields.io/badge/invariants-verified-brightgreen)](https://github.com/CJX0712) [![Author](https://img.shields.io/badge/author-晨星-blueviolet)](https://github.com/CJX0712)
+
+</div>
+
+
 > 零依赖、纯 JavaScript、可端到端反向传播的**可验证 AI 内核**。
 > 站在世界顶级数学与算法成果之上（tape 自动微分 / RoPE / GQA / SwiGLU / MoE / KAN），
 > 每个算子都通过**有限差分梯度检验**与**数学不变量**硬校验。
